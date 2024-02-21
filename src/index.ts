@@ -11,6 +11,7 @@ const defaultOptions: CreatorOptions = {
   subPackage: {
     rootDir: "pages-sub",
   },
+  styleType: "scss",
 };
 
 /**

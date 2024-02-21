@@ -1,62 +1,9 @@
 import { IPluginContext } from "@tarojs/service";
 import * as fs from "fs-extra";
 import * as path from "path";
+import { route, style, tsx } from "./templates";
 import { CreatorOptions } from "./types";
 
-/**
- *
- * @param group 页面分组
- * @param name  页面名称
- */
-const tsx = ({ name }) => {
-  return `import React, { memo } from "react";
-import { View } from "@tarojs/components";
-import styles from "./index.module.scss";
-
-const Component: React.FC = () => {
-  return (
-    <View title='${toCamelCase(name, true)}'>
-      <View className={styles.${toCamelCase(name)}Wrapper}>${toCamelCase(
-    name,
-    true
-  )}</View>
-    </View>
-  );
-};
-
-const ${toCamelCase(name, true)} = memo(Component)
-export default ${toCamelCase(name, true)};
-
-/**
- * 定义页面配置，需要注意的是，使用 definePageConfig 定义的页面配置对象不能使用变量。
- * 参考: https://docs.taro.zone/docs/page-config#配置项列表
- */
-definePageConfig({
-  disableScroll: true
-});
-`;
-};
-
-const style = (name) =>
-  `.${toCamelCase(name)}Wrapper{
-  // css style 
-}
-`;
-
-const route = () => `// 定义进入该页面需要传入的 params 参数的类型
-export type Params = {};
-
-// 定义进入该页面需要传入的 data 数据的类型
-export type Data = {};
-
-// 导出附加数据 Ext (附加数据是传递给中间件使用的)
-export const Ext = {};
-
-// 定义该页面返回的数据的类型
-export type BackData = {};
-
-`;
-//生产
 /**
  *
  * @param componentName 页面
@@ -67,30 +14,34 @@ export type BackData = {};
 export function PageGenerator(
   ctx: IPluginContext,
   pagePath: string,
-  pageName: string
+  pageName: string,
+  options: CreatorOptions
 ) {
   fs.ensureDirSync(pagePath);
 
-  // index.tsx
-  fs.writeFileSync(path.join(pagePath, `index.tsx`), tsx({ name: pageName }));
+  fs.writeFileSync(
+    path.join(pagePath, `index.tsx`),
+    tsx(pageName, options.styleType!)
+  );
   console.log(
-    ctx.helper.chalk.green("创建成功: \n" + path.join(pagePath, `index.tsx`))
+    ctx.helper.chalk.green(path.join(pagePath, `index.tsx` + " 创建成功"))
   );
 
-  // index.less
-  fs.writeFileSync(path.join(pagePath, `index.module.scss`), style(pageName));
+  // style
+  fs.writeFileSync(
+    path.join(pagePath, `index.module.${options.styleType}`),
+    style(pageName)
+  );
   console.log(
     ctx.helper.chalk.green(
-      "创建成功: \n" + path.join(pagePath, `index.module.scss`)
+      path.join(pagePath, `index.module.${options.styleType}`) + " 创建成功"
     )
   );
 
   // route.config.ts
   fs.writeFileSync(path.join(pagePath, `route.config.ts`), route());
   console.log(
-    ctx.helper.chalk.green(
-      "创建成功: \n" + path.join(pagePath, `route.config.ts`)
-    )
+    ctx.helper.chalk.green(path.join(pagePath, `route.config.ts`) + " 创建成功")
   );
 }
 
@@ -105,7 +56,7 @@ export const generatorMainPackagePage = (
   } else {
     const finalDir = path.resolve(getPagesPath(ctx, options), pagePath);
     const pageName = pagePath;
-    PageGenerator(ctx, finalDir, pageName);
+    PageGenerator(ctx, finalDir, pageName, options);
   }
 };
 
@@ -127,7 +78,7 @@ export const generatorSubPackagePage = (
       pagePath
     );
     const pageName = pagePathArr[1];
-    PageGenerator(ctx, finalDir, pageName);
+    PageGenerator(ctx, finalDir, pageName, options);
   }
 };
 
@@ -149,7 +100,7 @@ export const generatorTabBarPage = (
       pagePath
     );
     const pageName = pagePath;
-    PageGenerator(ctx, finalDir, pageName);
+    PageGenerator(ctx, finalDir, pageName, options);
   }
 };
 
@@ -173,9 +124,10 @@ export function toCamelCase(str: string, capitalizeFirstLetter = false) {
 }
 
 export function validPath(str: string): boolean {
+  if (typeof str !== "string") return false;
   const regex = /^[a-zA-Z\-\/][a-zA-Z0-9\-\/]*$/;
   return regex.test(str);
 }
 export function getPagesPath(ctx: IPluginContext, options: CreatorOptions) {
-  return path.resolve(ctx.paths.sourcePath, options.mainPackage.rootDir);
+  return path.resolve(ctx.paths.sourcePath, options.mainPackage.rootDir!);
 }
