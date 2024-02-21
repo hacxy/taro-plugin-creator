@@ -2,7 +2,7 @@
 
 ## 概述
 
-在 taro 项目中快捷创建主包、分包、tabbar 页面的命令行工具插件
+在 taro 项目中快捷创建主包、分包、tabbar 页面的命令行工具插件, 搭配[taro-plugin-auto-path](https://github.com/loclink/taro-plugin-auto-path)使用更佳.
 
 ## 特征
 
@@ -40,13 +40,6 @@ export default defineConfig(async (merge) => {
 
     // ...other config
   };
-
-  if (process.env.NODE_ENV === "development") {
-    // 本地开发构建配置（不混淆压缩）
-    return merge({}, baseConfig, devConfig);
-  }
-  // 生产构建配置（默认开启压缩混淆等）
-  return merge({}, baseConfig, prodConfig);
 });
 ```
 
@@ -120,13 +113,6 @@ export default defineConfig(async (merge) => {
 
     // ...other config
   };
-
-  if (process.env.NODE_ENV === "development") {
-    // 本地开发构建配置（不混淆压缩）
-    return merge({}, baseConfig, devConfig);
-  }
-  // 生产构建配置（默认开启压缩混淆等）
-  return merge({}, baseConfig, prodConfig);
 });
 ```
 
@@ -143,7 +129,7 @@ export const creatorOptions: CreatorOptions = {
     tabbarDir: "tabbar",
   },
   subPackage: {
-    rootDir: "pages-aaa",
+    rootDir: "pages-sub",
   },
 };
 ```
@@ -164,13 +150,6 @@ export default defineConfig(async (merge) => {
 
     // ...other config
   };
-
-  if (process.env.NODE_ENV === "development") {
-    // 本地开发构建配置（不混淆压缩）
-    return merge({}, baseConfig, devConfig);
-  }
-  // 生产构建配置（默认开启压缩混淆等）
-  return merge({}, baseConfig, prodConfig);
 });
 ```
 
@@ -184,7 +163,7 @@ export default defineConfig(async (merge) => {
 
   所有的创建命令都以 `taro c` 开头, `c` 是 `creator`的缩写
 
-  > 如果你全局安装了 `@tarojs/cli` 则可以省略 npx, 直接执行 `taro c --help`
+  如果你全局安装了 `@tarojs/cli` 则可以省略 npx, 直接执行 `taro c --help`
 
 ```sh
 ❯ npx taro c --help
