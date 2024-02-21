@@ -20,3 +20,5 @@ export default (ctx: IPluginContext, pluginOpts: CreatorOptions) => {
   const options = mergeDeep(defaultOptions, pluginOpts);
   new Plugin(ctx, options).registerCommand();
 };
+
+export * from "./types";
